@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
       metadata: {
         clerkUserId: userId,
         email,
-        name,
-        billingInterval,
+        subscriptionInterval: billingInterval,
+        subscriptionTier: name,
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscribe`,
