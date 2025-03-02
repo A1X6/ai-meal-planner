@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,14 +11,34 @@ datasource db {
 }
 
 model Profile {
-  id                   String   @id @default(uuid())
-  userId               String   @unique
-  userName             String   @unique
-  email                String   @unique
+  id                   String           @id @default(uuid())
+  userId               String           @unique
+  userName             String           @unique
+  email                String           @unique
   subscriptionTier     String?
   subscriptionInterval String?
-  subscriptionActive   Boolean  @default(false)
-  stripeSubscriptionId String?  @unique
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  subscriptionActive   Boolean          @default(false)
+  stripeSubscriptionId String?          @unique
+  usage                Int              @default(0)
+  mealPlans            SavedMealPlan[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+ 
+
+  // Added composite index for common query patterns
+  @@index([subscriptionActive, subscriptionTier])
+}
+
+model SavedMealPlan {
+  id           String   @id @default(uuid())  // Better collision resistance than cuid()
+  userId       String
+  user         Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  mealPlanData Json?    // Use native JSON type instead of String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Added indexes for common access patterns
+  @@index([userId, createdAt])
+  @@index([name])
 }

@@ -5,8 +5,10 @@ CREATE TABLE "Profile" (
     "userName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "subscriptionTier" TEXT,
+    "subscriptionInterval" TEXT,
     "subscriptionActive" BOOLEAN NOT NULL DEFAULT false,
     "stripeSubscriptionId" TEXT,
+    "usage" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

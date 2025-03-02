@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HiMiniAdjustmentsVertical } from "react-icons/hi2";
 import { BsWrenchAdjustable } from "react-icons/bs";
+import { HiMenu, HiX } from "react-icons/hi";
 import {
   SignedIn,
   SignedOut,
@@ -15,6 +16,12 @@ import {
 import Update from "./Update";
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <nav className="sticky top-0 w-full bg-gray-900/95 backdrop-blur-md border-b border-gray-800 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,13 +41,20 @@ const Navbar = () => {
             </Link>
           </div>
 
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <SignedIn>
               <Link
                 href="/meal-plan"
                 className="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-in-out"
               >
-                Meal Plan
+                Generate Meal Plan
+              </Link>
+              <Link
+                href="/saved-meal-plans"
+                className="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-in-out"
+              >
+                Saved Meal Plans
               </Link>
               <Link
                 href="/subscribe"
@@ -60,6 +74,21 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+              onClick={toggleMenu}
+              aria-expanded={isMenuOpen}
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <HiX className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <HiMenu className="block h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+
             <SignedIn>
               <UserButton>
                 <UserButton.MenuItems>
@@ -78,27 +107,96 @@ const Navbar = () => {
                   <Update />
                 </UserButton.UserProfilePage>
               </UserButton>
-              <SignOutButton>
-                <button className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out">
-                  Sign out
-                </button>
-              </SignOutButton>
+              <div className="hidden md:block">
+                <SignOutButton>
+                  <button className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out">
+                    Sign out
+                  </button>
+                </SignOutButton>
+              </div>
             </SignedIn>
             <SignedOut>
-              <SignInButton mode="modal">
-                <button className="text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out">
-                  Sign in
-                </button>
-              </SignInButton>
-              <SignUpButton>
-                <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out shadow-lg shadow-purple-500/20">
-                  Sign up
-                </button>
-              </SignUpButton>
+              <div className="hidden md:flex items-center space-x-2">
+                <SignInButton mode="modal">
+                  <button className="text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out">
+                    Sign in
+                  </button>
+                </SignInButton>
+                <SignUpButton>
+                  <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out shadow-lg shadow-purple-500/20">
+                    Sign up
+                  </button>
+                </SignUpButton>
+              </div>
             </SignedOut>
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-800/90 backdrop-blur-sm border-b border-gray-700">
+            <SignedIn>
+              <Link
+                href="/meal-plan"
+                className="block text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Generate Meal Plan
+              </Link>
+              <Link
+                href="/saved-meal-plans"
+                className="block text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Saved Meal Plans
+              </Link>
+              <Link
+                href="/subscribe"
+                className="block text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Subscriptions
+              </Link>
+              <div className="mt-4 px-3">
+                <SignOutButton>
+                  <button className="w-full bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out">
+                    Sign out
+                  </button>
+                </SignOutButton>
+              </div>
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href="/subscribe"
+                className="block text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Subscriptions
+              </Link>
+              <div className="flex flex-col space-y-2 mt-4 px-3">
+                <SignInButton mode="modal">
+                  <button
+                    className="w-full text-gray-300 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign in
+                  </button>
+                </SignInButton>
+                <SignUpButton>
+                  <button
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out shadow-lg shadow-purple-500/20"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign up
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

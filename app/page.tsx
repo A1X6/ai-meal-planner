@@ -32,13 +32,7 @@ export default function Home() {
                 href="/meal-plan"
                 className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 ease-in-out shadow-lg shadow-purple-500/20"
               >
-                View Your Meal Plan
-              </Link>
-              <Link
-                href="/profile"
-                className="inline-flex items-center justify-center px-6 py-3 border border-gray-700 text-base font-medium rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-200 ease-in-out"
-              >
-                Update Preferences
+                Generate Meal Plan
               </Link>
             </div>
           </SignedIn>

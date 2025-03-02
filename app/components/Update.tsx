@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Update = () => {
   return (
@@ -6,6 +6,6 @@ const Update = () => {
       <h1>Update preferences</h1>
     </div>
   );
-}
+};
 
 export default Update;

@@ -8,6 +8,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Scrollbar Colors */
+  --scrollbar-bg: #1f2937;
+  --scrollbar-thumb-start: #3b82f6; /* blue-500 */
+  --scrollbar-thumb-end: #8b5cf6; /* purple-500 */
+  --scrollbar-thumb-hover-start: #2563eb; /* blue-600 */
+  --scrollbar-thumb-hover-end: #7c3aed; /* purple-600 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,4 +26,71 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom Scrollbar Styles */
+/* For Webkit Browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    var(--scrollbar-thumb-start),
+    var(--scrollbar-thumb-end)
+  );
+  border-radius: 8px;
+  border: 2px solid var(--scrollbar-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    var(--scrollbar-thumb-hover-start),
+    var(--scrollbar-thumb-hover-end)
+  );
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-start) var(--scrollbar-bg);
+}
+
+/* Custom scrollbar for specific scrollable areas like the allergies list */
+.max-h-40.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-40.overflow-y-auto::-webkit-scrollbar-thumb {
+  border-width: 1px;
+}
+
+/* Make the scrollbar more discrete when not being used */
+::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  transition: background 0.2s ease-in-out;
+}
+
+/* Enhancement for horizontal scrollbars like in the day selector */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+/* Hide scrollbar for a cleaner look, but keep functionality */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    scrollbar-width: none;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none;
+  }
 }
