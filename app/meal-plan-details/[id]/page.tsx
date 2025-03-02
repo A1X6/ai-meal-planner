@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
@@ -43,15 +43,25 @@ export default function MealPlanDetailsPage({
   });
 
   // Get selected day and calculate totals (if we have data)
-  const selectedDay =
-    mealPlan && mealPlan.mealPlanData && mealPlan.mealPlanData.length > 0
-      ? mealPlan.mealPlanData[activeDayIndex]
-      : null;
+  const selectedDay = useMemo(() => {
+    if (mealPlan && mealPlan.mealPlanData && mealPlan.mealPlanData.length > 0) {
+      return mealPlan.mealPlanData[activeDayIndex];
+    }
+    return null;
+  }, [mealPlan, activeDayIndex]);
 
-  const dailyTotals =
-    selectedDay && selectedDay.meals
-      ? calculateDailyTotals(selectedDay.meals)
-      : null;
+  const dailyTotals = useMemo(() => {
+    if (selectedDay && selectedDay.meals) {
+      return calculateDailyTotals(selectedDay.meals);
+    }
+    return null;
+  }, [selectedDay]);
+
+  // Function to handle day change
+  const handleDayChange = (newIndex: number) => {
+    console.log(`Changing day to index: ${newIndex}`);
+    setActiveDayIndex(newIndex);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
@@ -113,7 +123,7 @@ export default function MealPlanDetailsPage({
                     <DaySelector
                       days={mealPlan.mealPlanData}
                       activeIndex={activeDayIndex}
-                      onDayChange={setActiveDayIndex}
+                      onDayChange={handleDayChange}
                     />
                   </div>
 

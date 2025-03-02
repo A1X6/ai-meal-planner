@@ -158,10 +158,19 @@ const MealPlanPage = () => {
   const hasMealPlanData = displayData.length > 0;
 
   // Get selected day and calculate totals (if we have data)
-  const selectedDay = hasMealPlanData ? displayData[activeDayIndex] : null;
-  const dailyTotals = selectedDay
-    ? calculateDailyTotals(selectedDay.meals)
-    : null;
+  const selectedDay = useMemo(() => {
+    return hasMealPlanData ? displayData[activeDayIndex] : null;
+  }, [hasMealPlanData, displayData, activeDayIndex]);
+
+  const dailyTotals = useMemo(() => {
+    return selectedDay ? calculateDailyTotals(selectedDay.meals) : null;
+  }, [selectedDay]);
+
+  // Function to handle day change with logging
+  const handleDayChange = (newIndex: number) => {
+    console.log(`Changing day to index: ${newIndex}`);
+    setActiveDayIndex(newIndex);
+  };
 
   return (
     <div className="min-h-[calc(100vh-65px)] bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
@@ -274,7 +283,7 @@ const MealPlanPage = () => {
                         <DaySelector
                           days={displayData}
                           activeIndex={activeDayIndex}
-                          onDayChange={setActiveDayIndex}
+                          onDayChange={handleDayChange}
                         />
                       </div>
 
