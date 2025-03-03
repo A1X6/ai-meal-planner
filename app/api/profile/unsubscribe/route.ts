@@ -3,7 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import stripe from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
     const clerkUser = await currentUser();
 
