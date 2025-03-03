@@ -180,7 +180,11 @@ const SubscribePage = () => {
                 </ul>
 
                 <button
-                  onClick={() => handleSubscribe(plan)}
+                  onClick={
+                    plan.id === "free"
+                      ? () => router.push("/sign-up")
+                      : () => handleSubscribe(plan)
+                  }
                   className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 ${
                     plan.highlighted
                       ? "bg-violet-500 hover:bg-violet-600 text-white"
@@ -191,7 +195,11 @@ const SubscribePage = () => {
                   disabled={isPending}
                 >
                   {isPending ? (
-                    <PuffLoader color="#ffffff" size={15} cssOverride={{"margin":" 5px auto"}} />
+                    <PuffLoader
+                      color="#ffffff"
+                      size={15}
+                      cssOverride={{ margin: " 5px auto" }}
+                    />
                   ) : plan.id === "free" ? (
                     "Get Started"
                   ) : (
