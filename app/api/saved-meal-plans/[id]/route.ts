@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "../../../../lib/prisma";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest) {
   try {
-    const { id } = params;
+    const url = new URL(req.url);
+    const id = url.pathname.split("/").pop();
     const { userId } = await auth();
 
     // Check if user is authenticated

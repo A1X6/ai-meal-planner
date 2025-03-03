@@ -12,9 +12,6 @@ export interface DayPlan {
 
 export interface NutritionTotals {
   calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
 }
 
 export interface Preferences {

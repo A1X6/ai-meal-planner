@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { HiArrowLeft } from "react-icons/hi";
@@ -24,12 +25,9 @@ const fetchSavedMealPlan = async (id: string): Promise<SavedMealPlan> => {
 export default function MealPlanDetailsPage({
   params,
 }: {
-  params: { id: string } | Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  // Unwrap params using React.use() if it's a Promise
-  const unwrappedParams =
-    params instanceof Promise ? React.use(params) : params;
-  const { id } = unwrappedParams;
+  const { id } = use(params);
   const [activeDayIndex, setActiveDayIndex] = useState(0);
 
   const {
