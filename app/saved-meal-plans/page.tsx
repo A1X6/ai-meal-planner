@@ -8,6 +8,7 @@ import {
   MdHourglassEmpty,
   MdDeleteOutline,
   MdCalendarViewWeek,
+  MdWarning,
 } from "react-icons/md";
 import { HiArrowLeft } from "react-icons/hi";
 import { SavedMealPlan } from "../components/meal-plan/types";
@@ -37,6 +38,8 @@ const deleteMealPlan = async (id: string): Promise<void> => {
 
 const SavedMealPlansPage: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [mealPlanToDelete, setMealPlanToDelete] = useState<string | null>(null);
 
   const {
     data: savedMealPlans,
@@ -49,6 +52,16 @@ const SavedMealPlansPage: React.FC = () => {
     queryFn: fetchSavedMealPlans,
   });
 
+  const confirmDelete = (id: string) => {
+    setMealPlanToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setMealPlanToDelete(null);
+  };
+
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
@@ -58,6 +71,8 @@ const SavedMealPlansPage: React.FC = () => {
       console.error("Error deleting meal plan:", error);
     } finally {
       setDeletingId(null);
+      setShowDeleteConfirm(false);
+      setMealPlanToDelete(null);
     }
   };
 
@@ -144,7 +159,7 @@ const SavedMealPlansPage: React.FC = () => {
                             {mealPlan.name}
                           </h3>
                           <button
-                            onClick={() => handleDelete(mealPlan.id)}
+                            onClick={() => confirmDelete(mealPlan.id)}
                             disabled={deletingId === mealPlan.id}
                             className="text-gray-400 hover:text-red-400 transition-colors duration-200"
                             aria-label="Delete meal plan"
@@ -203,6 +218,38 @@ const SavedMealPlansPage: React.FC = () => {
           </div>
         </div>
       </SignedOut>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 max-w-md w-full">
+            <div className="flex items-center mb-4 text-amber-400">
+              <MdWarning className="w-6 h-6 mr-2" />
+              <h3 className="text-xl font-semibold">Confirm Deletion</h3>
+            </div>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete this meal plan? This action cannot
+              be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200"
+              >
+                No, Cancel
+              </button>
+              <button
+                onClick={() =>
+                  mealPlanToDelete && handleDelete(mealPlanToDelete)
+                }
+                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-200 flex items-center"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -36,6 +36,7 @@ export interface MealPlanResponse {
     isSubscribed: boolean;
   };
   error?: string;
+  limitReached?: boolean;
 }
 
 export interface SavedMealPlan {

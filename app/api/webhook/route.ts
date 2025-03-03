@@ -39,6 +39,12 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleCustomerSubscriptionUpdated(subscription);
+        break;
+      }
+
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -110,7 +116,6 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   } catch (error) {
     console.error("Error updating profile:", error);
   }
-  
 }
 
 async function handleCustomerSubscriptionDeleted(
@@ -143,6 +148,71 @@ async function handleCustomerSubscriptionDeleted(
         subscriptionTier: null,
       },
     });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+  }
+}
+
+async function handleCustomerSubscriptionUpdated(
+  subscription: Stripe.Subscription
+) {
+  const subscriptionId = subscription.id;
+
+  // Find the user associated with this subscription
+  let userId: string | undefined;
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { stripeSubscriptionId: subscriptionId },
+      select: { userId: true },
+    });
+    if (!profile?.userId) {
+      console.error("No profile found for subscription ID:", subscriptionId);
+      return;
+    }
+    userId = profile.userId;
+  } catch (error) {
+    console.error("Error retrieving subscription:", error);
+    return;
+  }
+
+  // Get the current price ID from the subscription
+  if (subscription.items.data.length === 0) {
+    console.error("No items found in subscription:", subscriptionId);
+    return;
+  }
+
+  const priceId = subscription.items.data[0].price.id;
+
+  try {
+    // Fetch the price and product details
+    const priceInfo = await stripe.prices.retrieve(priceId);
+    const productInfo = await stripe.products.retrieve(
+      priceInfo.product as string
+    );
+
+    // Extract subscription details
+    const subscriptionTier = productInfo.metadata.tier || "premium";
+    const subscriptionInterval = priceInfo.recurring?.interval || "month";
+
+    // Determine subscription status
+    const isActive =
+      subscription.status === "active" || subscription.status === "trialing";
+
+    // Update the profile in the database
+    await prisma.profile.update({
+      where: { userId },
+      data: {
+        subscriptionActive: isActive,
+        subscriptionTier,
+        subscriptionInterval,
+        stripeSubscriptionId: subscriptionId,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
+      },
+    });
+
+    console.log(
+      `Updated subscription for user ${userId} to tier ${subscriptionTier} with interval ${subscriptionInterval}`
+    );
   } catch (error) {
     console.error("Error updating profile:", error);
   }

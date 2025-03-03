@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { HiOutlineMenu, HiOutlineChevronRight } from "react-icons/hi";
+import Link from "next/link";
 
 // Import components
 import MealPlanHeader from "../components/meal-plan/MealPlanHeader";
@@ -31,11 +32,18 @@ async function generateMealPlan(preferences: Preferences) {
     body: JSON.stringify({ ...preferences, days: 7 }),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
+    // Check if this is a limit reached error
+    if (data.limitReached) {
+      // Instead of throwing an error, return a special object
+      return { limitReached: true };
+    }
     throw new Error("Failed to generate meal plan");
   }
 
-  return response.json();
+  return data;
 }
 
 // Helper function to transform API response to the format expected by components
@@ -84,6 +92,7 @@ const MealPlanPage = () => {
   const [activeDayIndex, setActiveDayIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   const [preferences, setPreferences] = useState<Preferences>({
     dietType: "balanced",
     calorieTarget: 2000,
@@ -105,9 +114,16 @@ const MealPlanPage = () => {
 
   // Core function to generate meal plan with an option to close sidebar on mobile
   const generateNewMealPlan = (closeSidebarOnMobile = false) => {
+    setIsLimitReached(false);
     mutate(preferences, {
       onSuccess: (data) => {
         try {
+          // Check if this is a limit reached response
+          if ("limitReached" in data && data.limitReached === true) {
+            setIsLimitReached(true);
+            return;
+          }
+
           setMealPlan(data);
           setActiveDayIndex(0);
           setError(null);
@@ -243,8 +259,58 @@ const MealPlanPage = () => {
                     />
                   </div>
 
+                  {/* Usage limit reached state */}
+                  {isLimitReached && (
+                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                      <div className="bg-gray-800/50 rounded-lg p-8 max-w-md border border-amber-500/30">
+                        <div className="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-amber-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-semibold text-amber-300 mb-4">
+                          Free Trial Limit Reached
+                        </h3>
+                        <p className="text-gray-300 mb-6">
+                          You&apos;ve reached the limit of 5 meal plans on your
+                          free trial. Subscribe now to continue generating
+                          unlimited meal plans and unlock premium features.
+                        </p>
+                        <Link
+                          href="/subscribe"
+                          className="px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-medium rounded-lg shadow-lg transition-all duration-200 inline-flex items-center"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 mr-2"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Subscribe Now
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Empty state - when no meal plan data */}
-                  {!hasMealPlanData && !error && (
+                  {!hasMealPlanData && !error && !isLimitReached && (
                     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                       <div className="bg-gray-800/50 rounded-lg p-8 max-w-md">
                         <h3 className="text-xl font-semibold text-gray-200 mb-4">
@@ -265,7 +331,7 @@ const MealPlanPage = () => {
                     </div>
                   )}
 
-                  {error && (
+                  {error && !isLimitReached && (
                     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                       <div className="bg-gray-800/50 rounded-lg p-8 max-w-md">
                         <h3 className="text-xl font-semibold text-gray-200 mb-4">
@@ -276,7 +342,7 @@ const MealPlanPage = () => {
                   )}
 
                   {/* Meal plan content - only show when we have data */}
-                  {hasMealPlanData && (
+                  {hasMealPlanData && !isLimitReached && (
                     <>
                       {/* Day selector - adjust padding for tablet */}
                       <div className="mb-6 lg:mb-8">

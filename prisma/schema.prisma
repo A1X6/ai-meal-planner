@@ -18,6 +18,7 @@ model Profile {
   subscriptionTier     String?
   subscriptionInterval String?
   subscriptionActive   Boolean          @default(false)
+  cancelAtPeriodEnd    Boolean          @default(false)
   stripeSubscriptionId String?          @unique
   usage                Int              @default(0)
   mealPlans            SavedMealPlan[]

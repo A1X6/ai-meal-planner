@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { MdOutlineOpenInNew, MdSave } from "react-icons/md";
+import { MdOutlineOpenInNew, MdSave, MdCheckCircle } from "react-icons/md";
 import { useMutation } from "@tanstack/react-query";
 import { DayPlan } from "./types";
 
@@ -30,6 +30,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ mealPlan }) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [mealPlanName, setMealPlanName] = useState("");
   const [saveError, setSaveError] = useState("");
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   const { mutate: saveMutation, isPending } = useMutation({
     mutationFn: saveMealPlan,
@@ -37,7 +38,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ mealPlan }) => {
       setShowSaveModal(false);
       setMealPlanName("");
       setSaveError("");
-      // Could show a success toast here
+      // Show success toast
+      setShowSuccessToast(true);
+      // Hide toast after 3 seconds
+      setTimeout(() => {
+        setShowSuccessToast(false);
+      }, 3000);
     },
     onError: (error: Error) => {
       setSaveError(error.message);
@@ -159,6 +165,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ mealPlan }) => {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center z-50 animate-fade-in-up">
+          <MdCheckCircle className="w-5 h-5 mr-2" />
+          <span>Meal plan saved successfully!</span>
         </div>
       )}
     </>

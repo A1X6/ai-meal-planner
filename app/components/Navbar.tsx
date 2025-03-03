@@ -13,7 +13,7 @@ import {
   UserButton,
   SignOutButton,
 } from "@clerk/nextjs";
-import Update from "./Update";
+import { SubscriptionStatus } from "./subscription";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,18 +93,18 @@ const Navbar = () => {
               <UserButton>
                 <UserButton.MenuItems>
                   <UserButton.Action
-                    label="Update preferences"
+                    label="Subscription status"
                     labelIcon={<HiMiniAdjustmentsVertical />}
-                    open="update-preferences"
+                    open="subscription-status"
                   />
                 </UserButton.MenuItems>
 
                 <UserButton.UserProfilePage
-                  label="Update preferences"
+                  label="Subscription status"
                   labelIcon={<BsWrenchAdjustable />}
-                  url="update-preferences"
+                  url="subscription-status"
                 >
-                  <Update />
+                  <SubscriptionStatus />
                 </UserButton.UserProfilePage>
               </UserButton>
               <div className="hidden md:block">
